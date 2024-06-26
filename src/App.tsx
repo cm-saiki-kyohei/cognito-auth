@@ -22,6 +22,14 @@ function App() {
     fetchIdTokenFromLocalStorage();
   }, []);
 
+  const buildIframeSrc = (token: string): string => {
+    const GRAFANA_URL = import.meta.env.VITE_GRAFANA_URL;
+    const DASHBOARD_UID = import.meta.env.VITE_DASHBOARD_UID;
+    const DASHBOARD_SLUG = import.meta.env.VITE_DASHBOARD_SLUG;
+
+    return `${GRAFANA_URL}/d-solo/${DASHBOARD_UID}/${DASHBOARD_SLUG}?orgId=1&from=now-6h&to=now&panelId=1&auth_token=${token}`;
+  };
+
   return (
     <Authenticator>
       {({ signOut, user }) => (
@@ -35,11 +43,21 @@ function App() {
           )}
           {idToken && (
             <div>
-              <h2>ID Token:</h2>
-              <pre>{idToken}</pre>
+              <div>
+                <h2>ID Token:</h2>
+                <pre>{idToken}</pre>
+              </div>
+              <div>
+                <h2>Grafana Dashboard</h2>
+                <iframe
+                  src={buildIframeSrc(idToken)}
+                  width="450" height="200"></iframe>
+              </div>
             </div>
           )}
-          <button onClick={signOut}>Sign out</button>
+          <div>
+            <button onClick={signOut}>Sign out</button>
+          </div>
         </main>
       )}
     </Authenticator>
